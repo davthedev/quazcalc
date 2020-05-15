@@ -61,7 +61,7 @@ export default {
     },
 
     calculate() {
-      let result = eval(this.value_buffer);// eslint-disable-line no-eval
+      let result = this.$exactMath.formula(this.value_buffer);
       this.value_buffer = String(result);
     },
   },
