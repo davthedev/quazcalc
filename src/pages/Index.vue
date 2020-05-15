@@ -1,10 +1,13 @@
 <template>
   <q-page class="calc-page">
       <div class="column calc-output q-pa-sm">
-        <p class="text-right q-mb-none text-grey-5 calc-output-caption">CALC</p>
+        <p class="text-right q-mb-none text-pink-12 calc-output-caption" v-if="calc_error">Error <q-icon name="error_outline" /></p>
+        <p class="text-right q-mb-none text-grey-5 calc-output-caption" v-else>{{formula_buffer}}</p>
         <p class="col text-center q-mb-none text-grey-9" v-if="!value_buffer">
-          Type in....</p>
-        <p class="text-right q-mb-none text-white" v-if="value_buffer">{{value_buffer}}</p>
+          Type in...</p>
+        <p class="text-right q-mb-none"
+          :class="calc_error ? 'text-pink-12' : (showing_result ? 'text-light-green-14' : 'text-white')"
+          v-if="value_buffer">{{value_buffer}}</p>
       </div>
         
       <q-btn class="btn-1" unelevated color="grey-7" label="1" @click="typeNewDigit(1)"/>
@@ -17,11 +20,11 @@
       <q-btn class="btn-8" unelevated color="grey-7" label="8" @click="typeNewDigit(8)"/>
       <q-btn class="btn-9" unelevated color="grey-7" label="9" @click="typeNewDigit(9)"/>
       <q-btn class="btn-0" unelevated color="grey-7" label="0" @click="typeNewDigit(0)"/>
-      <q-btn class="btn-point" unelevated color="grey-9" label="." @click="typeNewDigit('.')"/>
-      <q-btn class="btn-plus" unelevated color="grey-9" label="+" @click="typeNewDigit('+')"/>
-      <q-btn class="btn-minus" unelevated color="grey-9" @click="typeNewDigit('-')">&minus;</q-btn>
-      <q-btn class="btn-multiply" unelevated color="grey-9" @click="typeNewDigit('*')">&times;</q-btn>
-      <q-btn class="btn-divide" unelevated color="grey-9" @click="typeNewDigit('/')">&divide;</q-btn>
+      <q-btn class="btn-point" unelevated color="grey-7" label="." @click="typeNewDigit('.')"/>
+      <q-btn class="btn-plus" unelevated color="grey-9" label="+" @click="typeNewOperator('+')"/>
+      <q-btn class="btn-minus" unelevated color="grey-9" @click="typeNewOperator('-')">&minus;</q-btn>
+      <q-btn class="btn-multiply" unelevated color="grey-9" @click="typeNewOperator('x')">&times;</q-btn>
+      <q-btn class="btn-divide" unelevated color="grey-9" @click="typeNewOperator('\u00f7')">&divide;</q-btn>
       <q-btn class="btn-erase" unelevated color="pink-12" icon="backspace" @click="eraseOneDigit"/>
       <q-btn class="btn-clear" unelevated color="pink-12" icon="delete" @click="eraseAll"/>
       <q-btn class="btn-exe" unelevated label="=" color="light-green-14" @click="calculate"/>
@@ -35,6 +38,9 @@ export default {
   data() {
     return {
       value_buffer: '',
+      formula_buffer: '',
+      calc_error: false,
+      showing_result: false,
     };
   },
 
@@ -46,23 +52,59 @@ export default {
 
   methods: {
     typeNewDigit(digit) {
-      this.value_buffer += digit;
+
+      let buf = this.value_buffer;
+      if (this.showing_result) {
+        buf = String(digit);
+      } else {
+        buf += digit;
+      }
+
+      this.clearError();
+      this.clearResultMode();
+      this.value_buffer = buf;
+    },
+
+    typeNewOperator(symbol) {
+      this.clearError();
+      this.clearResultMode();
+      this.value_buffer += symbol;
     },
 
     eraseOneDigit() {
       if (this.value_buffer === '') {
         return;
       }
+      this.clearError();
+      this.clearResultMode();
       this.value_buffer = this.value_buffer.substring(0, this.value_buffer.length - 1);
     },
 
     eraseAll() {
       this.value_buffer = '';
+      this.clearError();
+      this.clearResultMode();
+    },
+
+    clearError() {
+      this.calc_error = false;
+    },
+    clearResultMode() {
+      this.showing_result = false;
+      this.formula_buffer = '';
     },
 
     calculate() {
-      let result = this.$exactMath.formula(this.value_buffer);
-      this.value_buffer = String(result);
+      const mathconfig = { divideByZeroError: true };
+
+      try {
+        let result = this.$exactMath.formula(this.value_buffer, mathconfig);
+        this.formula_buffer = `${this.value_buffer} =`;
+        this.value_buffer = String(result);
+        this.showing_result = true;
+      } catch (e) {
+        this.calc_error = true;
+      }
     },
   },
 };
