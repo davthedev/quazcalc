@@ -72,6 +72,8 @@ module.exports = {
     "no-console": 'off',
     "prefer-const": 'off',
     "max-len": 'warn',
+    "padded-blocks": 'warn',
+    "brace-style": 'warn',
     "arrow-parens": 'off',
 
     "vue/no-unused-components" : "warn",
