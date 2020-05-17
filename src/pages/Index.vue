@@ -23,7 +23,7 @@
       <q-btn class="btn-point" unelevated color="grey-7" label="." @click="typeNewDigit('.')"/>
       <q-btn class="btn-plus" unelevated color="grey-9" label="+" @click="typeNewOperator('+')"/>
       <q-btn class="btn-minus" unelevated color="grey-9" @click="typeNewOperator('-')">&minus;</q-btn>
-      <q-btn class="btn-multiply" unelevated color="grey-9" @click="typeNewOperator('x')">&times;</q-btn>
+      <q-btn class="btn-multiply" unelevated color="grey-9" @click="typeNewOperator('\u00d7')">&times;</q-btn>
       <q-btn class="btn-divide" unelevated color="grey-9" @click="typeNewOperator('\u00f7')">&divide;</q-btn>
       <q-btn class="btn-erase" unelevated color="pink-12" icon="backspace" @click="eraseOneDigit"/>
       <q-btn class="btn-clear" unelevated color="pink-12" icon="delete" @click="eraseAll"/>
